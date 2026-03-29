@@ -1,9 +1,9 @@
 # mywant-ngrok
 
-A [MyWant](https://github.com/onelittlenightmusic/mywant) plugin that adds the `ngrok` want type.
+A [MyWant](https://github.com/onelittlenightmusic/mywant) plugin that adds the **Ngrok Tunnel** recipe.
 
-Manages an ngrok tunnel lifecycle to expose a local service via a public URL.
-Automatically starts the ngrok process, parses the forwarding URL from stdout, and stores it in state.
+Exposes a local service via a public URL using ngrok.
+Uses the built-in `managed_process` want type under the hood.
 
 ## Requirements
 
@@ -13,40 +13,31 @@ Automatically starts the ngrok process, parses the forwarding URL from stdout, a
 ## Installation
 
 ```sh
-mkdir -p ~/.mywant/custom-types
-curl -o ~/.mywant/custom-types/ngrok.yaml \
+mkdir -p ~/.mywant/recipes
+curl -o ~/.mywant/recipes/ngrok.yaml \
   https://raw.githubusercontent.com/onelittlenightmusic/mywant-ngrok-plugin/main/ngrok.yaml
-```
-
-Or manually copy `ngrok.yaml` to `~/.mywant/custom-types/`.
-The type is loaded automatically on next server start, or register it without restart:
-
-```sh
-mywant types create -f ~/.mywant/custom-types/ngrok.yaml
 ```
 
 ## Usage
 
-```yaml
-metadata:
-  name: my-tunnel
-  type: ngrok
-spec:
-  params:
-    port: "3000"
-```
-
 ```sh
-mywant wants create -f my-tunnel.yaml
+# List available recipes (confirm "Ngrok Tunnel" appears)
+mywant recipes list
+
+# Deploy with default port 8080
+mywant wants create --recipe "Ngrok Tunnel"
+
+# Deploy with custom port
+mywant wants create --recipe "Ngrok Tunnel" -p port=3000
 ```
 
 ## Parameters
 
-| Name | Type | Default | Description |
-|------|------|---------|-------------|
-| `port` | string | `"8080"` | Local port to expose |
-| `protocol` | string | `"http"` | Protocol (http, tcp, tls) |
-| `command` | string | `"ngrok"` | Path to ngrok binary |
-| `args` | string | `'["http","8080","--log","stdout"]'` | CLI arguments (JSON array) |
-| `max_retries` | int | `30` | Max retries waiting for URL |
-| `log_file` | string | `""` | Path to capture stdout (auto if empty) |
+| Name | Default | Description |
+|------|---------|-------------|
+| `port` | `"8080"` | Local port to expose |
+| `protocol` | `"http"` | Protocol (http, tcp, tls) |
+| `command` | `"ngrok"` | Path to ngrok binary |
+| `args` | `'["http","8080","--log","stdout"]'` | CLI arguments (JSON array) |
+| `max_retries` | `30` | Max retries waiting for URL |
+| `log_file` | `""` | Path to capture stdout (auto if empty) |
