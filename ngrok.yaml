@@ -15,6 +15,7 @@ recipe:
         mywant recipes list
         mywant wants create --recipe "Ngrok Tunnel" -p port=3000
 
+    custom_type: "ngrok"
     category: "tunnel"
     version: "1.0.0"
 
