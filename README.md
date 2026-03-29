@@ -13,9 +13,14 @@ Uses the built-in `managed_process` want type under the hood.
 ## Installation
 
 ```sh
-mkdir -p ~/.mywant/recipes
-curl -o ~/.mywant/recipes/ngrok.yaml \
-  https://raw.githubusercontent.com/onelittlenightmusic/mywant-ngrok-plugin/main/ngrok.yaml
+cd ~/.mywant/recipes
+git clone https://github.com/onelittlenightmusic/mywant-ngrok-plugin
+```
+
+The recipe is loaded automatically on next server start, or register it without restart:
+
+```sh
+mywant recipes create -f ~/.mywant/recipes/mywant-ngrok-plugin/ngrok.yaml
 ```
 
 ## Usage
@@ -29,6 +34,12 @@ mywant wants create --recipe "Ngrok Tunnel"
 
 # Deploy with custom port
 mywant wants create --recipe "Ngrok Tunnel" -p port=3000
+```
+
+## Update
+
+```sh
+cd ~/.mywant/recipes/mywant-ngrok-plugin && git pull
 ```
 
 ## Parameters
