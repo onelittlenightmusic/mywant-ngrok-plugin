@@ -24,7 +24,7 @@ recipe:
     command: "ngrok"
     args: '["http", "8080", "--log", "stdout"]'
     url_regex: '(?:Forwarding\s+|url=)(https?://\S+)'
-    result_field: "ngrok_url"
+    result_field: "server_url"
     max_retries: 30
     log_file: ""
 
