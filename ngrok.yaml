@@ -1,68 +1,127 @@
-recipe:
+wantType:
   metadata:
-    name: "Ngrok Tunnel"
+    name: ngrok
+    title: Ngrok Tunnel
     description: |
       Exposes a local service via a public URL using ngrok.
-
-      Starts an ngrok process, waits for the forwarding URL to appear in its output,
+      Starts ngrok in the background, waits for the forwarding URL to appear in its output,
       and stores it in state as `server_url` (also exposed as `final_result`).
 
       Requirements:
         - ngrok must be installed and available in PATH
         - For persistent URLs, configure ngrok authtoken beforehand
+    version: "1.0"
+    category: tunnel
 
-      Usage:
-        mywant recipes list
-        mywant wants create --recipe "Ngrok Tunnel" -p port=3000
+  parameters:
+    - name: port
+      description: Local port to expose
+      type: string
+      default: "8080"
+    - name: args
+      description: CLI arguments as JSON array (overrides port if set)
+      type: string
+      default: '["http", "8080", "--log", "stdout"]'
+    - name: command
+      description: Path to ngrok binary
+      type: string
+      default: "ngrok"
+    - name: url_regex
+      description: Regex to extract the forwarding URL from logs
+      type: string
+      default: '(?:Forwarding\s+|url=)(https?://\S+)'
+    - name: max_retries
+      description: Max retries waiting for the forwarding URL
+      type: int
+      default: 30
+    - name: log_file
+      description: Path to capture ngrok stdout (auto-generated if empty)
+      type: string
+      default: ""
 
-    custom_type: "ngrok"
-    category: "tunnel"
-    version: "1.0.0"
+  requires:
+    - live_server_management
 
   finalResultField: server_url
 
-  parameters:
-    port: "8080"
-    protocol: "http"
-    command: "ngrok"
-    args: '["http", "8080", "--log", "stdout"]'
-    url_regex: '(?:Forwarding\s+|url=)(https?://\S+)'
-    result_field: "server_url"
-    max_retries: 30
-    log_file: ""
+  onInitialize:
+    params:
+      process_command: command
+      process_args: args
+      process_log_file: log_file
+      url_regex: url_regex
+      result_field: result_field
+      max_retries: max_retries
+    current:
+      result_field: server_url
+    plan:
+      process_plan: "start"
+    executeAgents: true
 
-  parameter_descriptions:
-    port: "Local port to expose"
-    protocol: "Protocol for the tunnel (http, tcp, tls)"
-    command: "Path to ngrok binary"
-    args: "CLI arguments as JSON array"
-    url_regex: "Regex to extract the forwarding URL from logs"
-    result_field: "State field name to store the extracted URL"
-    max_retries: "Max retries waiting for the forwarding URL"
-    log_file: "Path to capture ngrok stdout (auto-generated if empty)"
+  onDelete:
+    plan:
+      process_plan: "stop"
+    executeAgents: true
 
-  wants:
-    - metadata:
-        type: managed_process
-        labels:
-          role: tunnel
-          provider: ngrok
-      spec:
-        params:
-          command: command
-          args: args
-          url_regex: url_regex
-          result_field: result_field
-          max_retries: max_retries
-          log_file: log_file
+  achievedWhen:
+    field: process_status
+    operator: "=="
+    value: "running"
 
-  example:
-    wants:
-      - metadata:
-          name: "ngrok-tunnel"
-          type: "ngrok"
-          labels:
-            recipe: "Ngrok Tunnel"
-        spec:
-          params:
-            port: "3000"
+  state:
+    - name: process_pid
+      type: int
+      label: current
+      persistent: true
+      initialValue: 0
+    - name: process_status
+      type: string
+      label: current
+      persistent: true
+      initialValue: ""
+    - name: process_log_file
+      type: string
+      label: current
+      persistent: true
+      initialValue: ""
+    - name: process_command
+      type: string
+      label: current
+      persistent: false
+      initialValue: ""
+    - name: process_args
+      type: string
+      label: current
+      persistent: false
+      initialValue: ""
+    - name: process_plan
+      type: string
+      label: plan
+      persistent: false
+      initialValue: ""
+    - name: url_regex
+      type: string
+      label: current
+      persistent: false
+      initialValue: ""
+    - name: result_field
+      type: string
+      label: current
+      persistent: false
+      initialValue: ""
+    - name: max_retries
+      type: int
+      label: current
+      persistent: false
+      initialValue: 0
+    - name: server_url
+      description: Extracted forwarding URL
+      type: string
+      label: current
+      persistent: true
+      initialValue: ""
+    - name: error_message
+      type: string
+      label: current
+      persistent: true
+      initialValue: ""
