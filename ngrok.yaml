@@ -12,6 +12,7 @@ wantType:
         - For persistent URLs, configure ngrok authtoken beforehand
     version: "1.0"
     category: tunnel
+    pattern: independent
 
   parameters:
     - name: port
