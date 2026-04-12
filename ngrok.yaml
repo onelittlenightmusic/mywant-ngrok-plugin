@@ -10,7 +10,7 @@ wantType:
       Requirements:
         - ngrok must be installed and available in PATH
         - For persistent URLs, configure ngrok authtoken beforehand
-    version: "1.0"
+    version: "2.0"
     category: tunnel
     pattern: independent
 
@@ -41,7 +41,7 @@ wantType:
       default: ""
 
   requires:
-    - live_server_management
+    - launch_management
 
   finalResultField: server_url
 
@@ -54,73 +54,96 @@ wantType:
       result_field: result_field
       max_retries: max_retries
     current:
+      launch_type: "process"
       result_field: server_url
     plan:
-      process_plan: "start"
+      launch_plan: "start"
     executeAgents: true
 
   onDelete:
     plan:
-      process_plan: "stop"
+      launch_plan: "stop"
     executeAgents: true
 
   achievedWhen:
-    field: process_status
+    field: launch_status
     operator: "=="
     value: "running"
 
   state:
+    - name: launch_type
+      type: string
+      label: current
+      persistent: false
+      initialValue: 'process'
+
+    - name: launch_plan
+      type: string
+      label: plan
+      persistent: false
+      initialValue: ""
+
+    - name: launch_status
+      type: string
+      label: current
+      persistent: true
+      initialValue: ""
+
+    - name: launch_error
+      type: string
+      label: current
+      persistent: true
+      initialValue: ""
+
     - name: process_pid
       type: int
       label: current
       persistent: true
       initialValue: 0
-    - name: process_status
-      type: string
-      label: current
-      persistent: true
-      initialValue: ""
+
     - name: process_log_file
       type: string
       label: current
       persistent: true
       initialValue: ""
+
     - name: process_command
       type: string
       label: current
       persistent: false
       initialValue: ""
+
     - name: process_args
       type: string
       label: current
       persistent: false
       initialValue: ""
-    - name: process_plan
-      type: string
-      label: plan
-      persistent: false
-      initialValue: ""
+
     - name: url_regex
       type: string
       label: current
       persistent: false
       initialValue: ""
+
     - name: result_field
       type: string
       label: current
       persistent: false
       initialValue: ""
+
     - name: max_retries
       type: int
       label: current
       persistent: false
       initialValue: 0
+
     - name: server_url
       description: Extracted forwarding URL
       type: string
       label: current
       persistent: true
       initialValue: ""
+
     - name: error_message
       type: string
       label: current
