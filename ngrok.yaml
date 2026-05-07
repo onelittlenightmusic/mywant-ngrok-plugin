@@ -39,6 +39,14 @@ wantType:
       description: Path to capture ngrok stdout (auto-generated if empty)
       type: string
       default: ""
+    - name: fallback_url_api
+      description: |
+        Local JSON API to query for the tunnel URL when url_regex scan fails.
+        ngrok exposes its running tunnels at http://127.0.0.1:4040/api/tunnels.
+        If ngrok is already running (ERR_NGROK_334), this fallback picks up the
+        existing tunnel URL automatically.
+      type: string
+      default: "http://127.0.0.1:4040/api/tunnels"
 
   requires:
     - launch_management
@@ -53,6 +61,7 @@ wantType:
       url_regex: url_regex
       result_field: result_field
       max_retries: max_retries
+      fallback_url_api: fallback_url_api
     current:
       launch_type: "process"
       result_field: server_url
