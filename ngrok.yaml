@@ -148,6 +148,12 @@ wantType:
       persistent: true
       initialValue: ""
 
+    - name: fallback_url_api
+      type: string
+      label: current
+      persistent: false
+      initialValue: ""
+
     - name: error_message
       type: string
       label: current
