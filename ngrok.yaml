@@ -5,7 +5,10 @@ wantType:
     description: |
       Exposes a local service via a public URL using ngrok.
       Starts ngrok in the background, waits for the forwarding URL to appear in its output,
-      and stores it in state as `server_url` (also exposed as `final_result`).
+      and stores it in state as `tunnel_url` (also exposed as `final_result`).
+      Since result_field defaults to "tunnel_url", the URL is also auto-persisted
+      into ~/.mywant/config.yaml's tunnel_url field — see storeLaunchResultURL in
+      mywant/engine/types/agent_launch_manager.go.
 
       Requirements:
         - ngrok must be installed and available in PATH
@@ -48,11 +51,19 @@ wantType:
         existing tunnel URL automatically.
       type: string
       default: "http://127.0.0.1:4040/api/tunnels"
+    - name: result_field
+      description: |
+        State field to store the captured URL in. Defaults to "tunnel_url", which
+        the engine auto-persists into ~/.mywant/config.yaml's tunnel_url field
+        once captured (see storeLaunchResultURL). Override to "server_url" (or
+        anything else) to opt out of that auto-persistence.
+      type: string
+      default: "tunnel_url"
 
   requires:
     - launch_management
 
-  finalResultField: server_url
+  finalResultField: tunnel_url
 
   onInitialize:
     params:
@@ -65,7 +76,6 @@ wantType:
       fallback_url_api: fallback_url_api
     current:
       launch_type: "process"
-      result_field: server_url
     plan:
       launch_plan: "start"
     executeAgents: true
@@ -143,7 +153,14 @@ wantType:
       initialValue: 0
 
     - name: server_url
-      description: Extracted forwarding URL
+      description: Extracted forwarding URL (populated only if result_field is overridden to "server_url")
+      type: string
+      label: current
+      persistent: true
+      initialValue: ""
+
+    - name: tunnel_url
+      description: Extracted forwarding URL (default result_field target) — mirrors config.yaml's tunnel_url once persisted
       type: string
       label: current
       persistent: true
