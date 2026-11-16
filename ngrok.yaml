@@ -1,6 +1,8 @@
 wantType:
   metadata:
     name: ngrok
+    labels:
+      aliases: "ngrok,tunnel,トンネル"
     title: Ngrok Tunnel
     description: |
       Exposes a local service via a public URL using ngrok.
