@@ -2,6 +2,9 @@ wantType:
   metadata:
     name: ngrok
     labels:
+      # What the robot reads a request against, when it asks Laya which want
+      # it is: the type in a few words of its own (laya-option).
+      laya-option: "ngrokでローカルのポートを公開する"
       aliases: "ngrok,tunnel,トンネル"
     title: Ngrok Tunnel
     description: |
@@ -70,6 +73,8 @@ wantType:
   # When it tells of its answer, besides the standard timing "answer": restarted: its process came up again.
   timings:
     - name: restarted
+      irregular: true   # out of the ordinary: the robot looks at it
+      requires: [notify]   # what it needs done (met by a capability that attends to it)
       description: プロセスが起動し直したとき（落ちて復帰した）
       icon: rotate-ccw
       onChange: process_pid
@@ -188,3 +193,14 @@ wantType:
       label: current
       persistent: true
       initialValue: ""
+
+  # How a want of this type is asked for, in words, and what it is made with
+  # (want-spec asks): what reads requests (the robot, Laya) learns from these
+  # and is tested on them. A parameter left out is one the request does not say.
+  asks:
+    - say: "ngrokで8080を公開"
+      variants: ["8080をngrokで外に公開して", "ngrokで8080番ポートを出して", "ngrokのトンネルで8080"]
+      params: {"port": "8080"}
+    - say: "ポート3000をngrokで外に出して"
+      variants: ["ngrokで3000を公開", "3000番ポートをngrokでトンネル", "ngrokで3000を外から見えるように"]
+      params: {"port": "3000"}
